@@ -15,9 +15,9 @@ import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText sText;
-    private static int REQUEST_IMG_CODE = 1;
-    private Uri media;
+    private EditText sText; // //text box id:s_text
+    private static int REQUEST_IMG_CODE = 1; //code for get intent result
+    private Uri media;  // media result uri
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,35 +35,35 @@ public class MainActivity extends AppCompatActivity {
 
     protected void shareText(View view) {
 
-        Intent iShareText = new Intent(Intent.ACTION_SEND);
+        Intent iShareText = new Intent(Intent.ACTION_SEND); //Intent calling action ACTION_SEND to send text
         String textSend = sText.getText().toString();
 
-        if(textSend.isEmpty()){
+        if(textSend.isEmpty()){         //texbox empty, set default text
             textSend = "Default text!";
         }
 
-        iShareText.setType("text/plain");
-        iShareText.putExtra(Intent.EXTRA_TEXT,textSend);
+        iShareText.setType("text/plain");   //MIME type, helps intent to know what it'll receive
+        iShareText.putExtra(Intent.EXTRA_TEXT,textSend); //attach text to the intent
 
-        startActivity(iShareText);
+        startActivity(iShareText); //start send text intent
     }
 
     protected void getMedia(View v){
 
-        Intent iGetMedia = new Intent();
+        Intent iGetMedia = new Intent(); //another way to create Intents
 
-        iGetMedia.setAction(Intent.ACTION_GET_CONTENT);
-        iGetMedia.setType("image/* video/* audio/*");
+        iGetMedia.setAction(Intent.ACTION_GET_CONTENT); //set the Action GET CONTENT to access to the storage/gallery
+        iGetMedia.setType("image/* video/* audio/*"); //MIME type, image, video or audio
 
-        startActivityForResult(iGetMedia,REQUEST_IMG_CODE);
+        startActivityForResult(iGetMedia,REQUEST_IMG_CODE); //start get media intent with the request code
     }
 
     protected void shareMedia(){
 
-        Intent iShareMedia = new Intent(Intent.ACTION_SEND);
+        Intent iShareMedia = new Intent(Intent.ACTION_SEND); //same above
 
-        iShareMedia.setType("image/* video/* audio/*");
-        iShareMedia.putExtra(Intent.EXTRA_STREAM,media);
+        iShareMedia.setType("image/* video/* audio/*"); //same above
+        iShareMedia.putExtra(Intent.EXTRA_STREAM,media); //set media URI returned by onActivityResult()
 
         startActivity(iShareMedia);
 
@@ -73,10 +73,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent iGotMedia) {
         super.onActivityResult(requestCode, resultCode, iGotMedia);
 
-            if(requestCode == REQUEST_IMG_CODE){
-                if(resultCode==RESULT_OK){
+            if(requestCode == REQUEST_IMG_CODE){    //checking if the request code is from getMedia()
+                if(resultCode==RESULT_OK){          //checking if result is ok
                     media = iGotMedia.getData();
                     shareMedia();
+                }
+
+                else if (resultCode==RESULT_CANCELED){
+                    Toast.makeText(this, "Getting media failed", Toast.LENGTH_SHORT).show();
                 }
             }
     }
