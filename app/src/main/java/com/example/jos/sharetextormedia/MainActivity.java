@@ -3,19 +3,22 @@ package com.example.jos.sharetextormedia;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText sText; // //text box id:s_text
     private static int REQUEST_IMG_CODE = 1; //code for get intent result
     private Uri media;  // media result uri
 
@@ -23,8 +26,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        sText = (EditText) findViewById(R.id.s_text);
 
     }
 
@@ -34,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void shareText(View view) {
+
+        EditText sText; // //text box id:s_text
+        sText = (EditText) findViewById(R.id.s_text); //get the button
 
         Intent iShareText = new Intent(Intent.ACTION_SEND); //Intent calling action ACTION_SEND to send text
         String textSend = sText.getText().toString();
@@ -58,7 +62,31 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(iGetMedia,REQUEST_IMG_CODE); //start get media intent with the request code
     }
 
-    protected void shareMedia(){
+    protected void preview(){
+
+        InputStream in;
+        Bitmap b;
+        ImageView iv = (ImageView) findViewById(R.id.imageView);
+
+        try{
+            //Two ways of visualize an img:
+            //Get the content resolver and open the image in an input stream
+            in = getContentResolver().openInputStream(media);
+            //Decode stream with BitmapFactory to create a Bitmap object
+            b = BitmapFactory.decodeStream(in);
+            //Set the Bitmap in the ImageView
+            iv.setImageBitmap(b);
+
+            // or just use: iv.setImageURI(media); and set the URI
+
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    protected void shareMedia(View v){
 
         Intent iShareMedia = new Intent(Intent.ACTION_SEND); //same above
 
@@ -76,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
             if(requestCode == REQUEST_IMG_CODE){    //checking if the request code is from getMedia()
                 if(resultCode==RESULT_OK){          //checking if result is ok
                     media = iGotMedia.getData();
-                    shareMedia();
+                    preview();
                 }
 
                 else if (resultCode==RESULT_CANCELED){
